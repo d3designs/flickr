@@ -246,7 +246,7 @@ class Flickr
 				return $response;
 			}
 
-			throw new Exception('This class requires RequestCore. http://requestcore.googlecode.com');
+			throw new Exception('This class requires RequestCore. http://github.com/skyzyx/requestcore.');
 		}
 
 		return $url;
