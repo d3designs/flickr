@@ -10,8 +10,7 @@ h2. Requirements
 * "RequestCore":http://requestcore.googlecode.com
 
 h2. Download
-<pre><code>
-git clone git@github.com:skyzyx/flickr.git
+<pre><code>git clone git@github.com:skyzyx/flickr.git
 cd flickr
 git submodule init
 git submodule update
@@ -27,8 +26,7 @@ h2. Example usage
 
 If you want to make a request to Flickr's <code>flickr.people.findByUsername</code> method, you'd do the following. This makes a request using "RequestCore":http://github.com/skyzyx/requestcore, defaults to an XML response from Flickr, and parses it with SimpleXML.
 
-<pre><code>
-$flickr = new Flickr();
+<pre><code>$flickr = new Flickr();
 $response = $flickr->people->find_by_username(array(
 	'username' => 'skyzyx'
 ));
@@ -39,8 +37,7 @@ You can look through the response to see how to traverse through the data.
 
 If you want to use a different response format, you'll also want to override the <code>parse_response()</code> method.
 
-<pre><code>
-class FlickrPHP extends Flickr
+<pre><code>class FlickrPHP extends Flickr
 {
 	public function parse_response($data)
 	{
