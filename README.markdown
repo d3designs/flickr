@@ -1,6 +1,7 @@
-# Flickr API
+# FlickrCache API
 
-This API will construct the appropriate Flickr REST API URL to query, and use RequestCore and SimpleXML to retrieve and parse the data (by default).
+This API will construct the appropriate Flickr REST API URL to query, and use RequestCore and unserialize() to retrieve and parse the serialized php data (by default).
+The extended FlickrCache response differs from the default Flickr class response. To get the actual response data, you don't have to use `$response->body`, you can simply use `$response`. Simple file based caching support has also been added, but is disabled by default. You can enable it by using the `cache_mode()` method.
 
 ## Requirements
 
@@ -11,7 +12,7 @@ This API will construct the appropriate Flickr REST API URL to query, and use Re
 
 ## Download
 
-	git clone git@github.com:skyzyx/flickr.git
+	git clone git@github.com:jaywilliams/flickr.git
 	cd flickr
 	git submodule init
 	git submodule update
@@ -24,37 +25,26 @@ I would recommend the former over the latter if you generally only use one key/s
 
 ## Example usage
 
-If you want to make a request to Flickr's `flickr.people.findByUsername` method, you'd do the following. This makes a request using [RequestCore](http://github.com/skyzyx/requestcore), defaults to an XML response from Flickr, and parses it with SimpleXML.
+If you want to make a request to Flickr's `flickr.people.findByUsername` method, you'd do the following. This makes a request using [RequestCore](http://github.com/skyzyx/requestcore), defaults to a serialized PHP response from Flickr, and parses it with unserialize().
 
-	$flickr = new Flickr();
+	$flickr = new FlickrCache();
+	$flickr->cache_mode(true);
 	$response = $flickr->people->find_by_username(array(
 		'username' => 'skyzyx'
 	));
-	print_r($response);
+	echo $response['user']['id'];
+	var_dump($response);
 
 You can look through the response to see how to traverse through the data.
 
-If you want to use a different response format, you'll also want to override the `parse_response()` method.
 
-	class FlickrPHP extends Flickr
-	{
-		public function parse_response($data)
-		{
-			return unserialize($data);
-		}
-	}
-
-	$flickr = new FlickrPHP();
-	$response = $flickr->people->find_by_username(array(
-		'username' => 'skyzyx',
-		'format' => 'php_serial'
-	));
-	print_r($response);
-
-This will give you working PHP data to iterate over. You can also use this override technique to switch from <code>SimpleXML</code> to <code>DOMDocument</code> or anything else you may want to use to parse the XML.
-
-To use a different HTTP request/response class, you would override the <code>request()</code> method.
 
 ## License & Copyright
 
-This code is Copyright (c) 2009, Ryan Parman. However, I'm licensing this code for others to use under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
+### Flickr Class
+
+Copyright (c) 2009, Ryan Parman [MIT license](http://www.opensource.org/licenses/mit-license.php)  
+
+### FlickrCache Class
+
+Copyright (c) 2009, Jay Williams [MIT license](http://www.opensource.org/licenses/mit-license.php)
