@@ -43,8 +43,10 @@ You can look through the response to see how to traverse through the data.
 
 ### Flickr Class
 
-Copyright (c) 2009, Ryan Parman [MIT license](http://www.opensource.org/licenses/mit-license.php)  
+URL: <http://github.com/skyzyx/flickr>  
+Copyright (c) 2009, Ryan Parman [MIT license](http://www.opensource.org/licenses/mit-license.php)
 
 ### FlickrCache Class
 
+URL: <http://github.com/jaywilliams/flickr>  
 Copyright (c) 2009, Jay Williams [MIT license](http://www.opensource.org/licenses/mit-license.php)
