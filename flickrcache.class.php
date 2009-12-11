@@ -34,6 +34,12 @@ class FlickrCache extends Flickr
 	 */
 	var $cache_path;
 
+	/**
+	 * Property: header_mode
+	 * 	Whether header response will be include in the output
+	 */
+	var $header_mode;
+
 
 	/*%******************************************************************************************%*/
 	// CONSTRUCTOR
@@ -56,9 +62,10 @@ class FlickrCache extends Flickr
 	public function __construct($key = null, $secret_key = null, $subclass = null){
 		
 		// Set default values
-		$this->cache_mode = false;
-		$this->cache_ttl  = 3600;
-		$this->cache_path = './cache/';
+		$this->cache_mode  = false;
+		$this->cache_ttl   = 3600;
+		$this->cache_path  = './cache/';
+		$this->header_mode = false;
 		
 		return parent::__construct($key, $secret_key, $subclass);
 	}
@@ -98,6 +105,24 @@ class FlickrCache extends Flickr
 			throw new Flickr_Exception('Cache directory doesn\'t exist or isn\'t writeable');
 	}
 
+	/**
+	 * Method: header_mode()
+	 * 	Enables header mode within the API. Enabling header mode will include the request header in addition to the body.
+	 *
+	 * Access:
+	 * 	public
+	 *
+	 * Parameters:
+	 * 	enabled - _boolean_ (Optional) Whether header mode is enabled or not.
+	 *
+	 * Returns:
+	 * 	void
+	 */
+	public function header_mode($enabled = true)
+	{
+		// Set default values
+		$this->header_mode = $enabled;
+	}
 
 	/*%******************************************************************************************%*/
 	// MAGIC METHODS
@@ -114,6 +139,7 @@ class FlickrCache extends Flickr
 		$ref = new $class_name($this->key, $this->secret_key, strtolower($var));
 		$ref->test_mode($this->test_mode); // Make sure this gets passed through.
 		$ref->cache_mode($this->cache_mode, $this->cache_ttl, $this->cache_path); // Make sure this gets passed through.
+		$ref->header_mode($this->header_mode); // Make sure this gets passed through.
 		
 		return $ref;
 	}
@@ -157,7 +183,7 @@ class FlickrCache extends Flickr
 		if($this->cache_mode && file_exists($cache) && (time() - filemtime($cache)) < $this->cache_ttl)
 		{
 			$response = (array) $this->parse_response(file_get_contents($cache));
-			$response['cached'] = true; // Add notice that this is a cached file
+			$response['_cached'] = true; // Add notice that this is a cached file
 			
 			return $response;
 		}
@@ -171,10 +197,13 @@ class FlickrCache extends Flickr
 		
 		$response = (array) $this->parse_response($http->get_response_body());
 		
+		if ($this->header_mode)
+			$response['_header'] = $http->get_response_header();
+		
 		// Cache only successfuly requests
 		if ($this->cache_mode && $response['stat'] == 'ok')
 		{
-			file_put_contents($cache . '_tmp', $http->get_response_body());
+			file_put_contents($cache . '_tmp', serialize($response));
 			rename($cache . '_tmp', $cache);
 		}
 		
