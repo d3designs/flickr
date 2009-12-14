@@ -29,11 +29,11 @@ I would recommend the former over the latter if you generally only use one key/s
 If you want to make a request to Flickr's `flickr.people.findByUsername` method, you'd do the following. This makes a request using [RequestCore](http://github.com/skyzyx/requestcore), defaults to a JSON response from Flickr, and parses it with json_decode().
 
 	$flickr = new FlickrCache();
-	$flickr->cache_mode(true);
+	$flickr->cache_mode(true, 3600, './cache/');
 	$response = $flickr->people->find_by_username(array(
 		'username' => 'skyzyx'
 	));
-	echo $response->user->id];
+	echo $response->user->id;
 	var_dump($response);
 
 You can look through the response to see how to traverse through the data.
