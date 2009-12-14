@@ -1,12 +1,13 @@
 # FlickrCache API
 
-This API will construct the appropriate Flickr REST API URL to query, and use RequestCore and unserialize() to retrieve and parse the serialized php data (by default).
+This API will construct the appropriate Flickr REST API URL to query, and use RequestCore and json_decode() to retrieve and parse the JSON data (by default).
 The extended FlickrCache response differs from the default Flickr class response. To get the actual response data, you don't have to use `$response->body`, you can simply use `$response`. Simple file based caching support has also been added, but is disabled by default. You can enable it by using the `cache_mode()` method.
 
 ## Requirements
 
 * PHP 5.2
 * cURL
+* JSON Functions
 * SimpleXML
 * [RequestCore](http://github.com/skyzyx/requestcore)
 
@@ -25,14 +26,14 @@ I would recommend the former over the latter if you generally only use one key/s
 
 ## Example usage
 
-If you want to make a request to Flickr's `flickr.people.findByUsername` method, you'd do the following. This makes a request using [RequestCore](http://github.com/skyzyx/requestcore), defaults to a serialized PHP response from Flickr, and parses it with unserialize().
+If you want to make a request to Flickr's `flickr.people.findByUsername` method, you'd do the following. This makes a request using [RequestCore](http://github.com/skyzyx/requestcore), defaults to a JSON response from Flickr, and parses it with json_decode().
 
 	$flickr = new FlickrCache();
 	$flickr->cache_mode(true);
 	$response = $flickr->people->find_by_username(array(
 		'username' => 'skyzyx'
 	));
-	echo $response['user']['id'];
+	echo $response->user->id];
 	var_dump($response);
 
 You can look through the response to see how to traverse through the data.

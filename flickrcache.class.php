@@ -1,10 +1,10 @@
 <?php
 /**
  * File: api-flickrCache
- * 	Handle the PHP Serialized Flickr API, and Cache the results to files.
+ * 	Handle the JSON formatted Flickr API, and Cache the results to files.
  *
  * Version:
- * 	2009.12.11
+ * 	2009.12.13
  *
  * Copyright:
  * 	2009 Jay Williams
@@ -59,7 +59,8 @@ class FlickrCache extends Flickr
 	 * Returns:
 	 * 	boolean FALSE if no valid values are set, otherwise true.
 	 */
-	public function __construct($key = null, $secret_key = null, $subclass = null){
+	public function __construct($key = null, $secret_key = null, $subclass = null)
+	{
 		
 		// Set default values
 		$this->cache_mode  = false;
@@ -69,6 +70,7 @@ class FlickrCache extends Flickr
 		
 		return parent::__construct($key, $secret_key, $subclass);
 	}
+
 
 	/*%******************************************************************************************%*/
 	// SETTERS
@@ -150,9 +152,9 @@ class FlickrCache extends Flickr
 	public function __call($name, $args)
 	{
 		// Include default arguments
-		$default_args = array('format' => 'php_serial');
+		$default_args = array('format' => 'json', 'nojsoncallback' => 1);
 		
-		$args[0] = array_merge($default_args,$args[0]);
+		$args[0] = array_merge($default_args, (array)$args[0]);
 		
 		return parent::__call($name, $args);
 	}
@@ -182,8 +184,8 @@ class FlickrCache extends Flickr
 		// If cache exists, and is still valid, load it
 		if($this->cache_mode && file_exists($cache) && (time() - filemtime($cache)) < $this->cache_ttl)
 		{
-			$response = (array) $this->parse_response(file_get_contents($cache));
-			$response['_cached'] = true; // Add notice that this is a cached file
+			$response = (object) json_decode(file_get_contents($cache));
+			$response->_cached = true; // Add notice that this is a cached file
 			
 			return $response;
 		}
@@ -195,15 +197,15 @@ class FlickrCache extends Flickr
 		$http->set_useragent(FLICKR_USERAGENT);
 		$http->send_request();
 		
-		$response = (array) $this->parse_response($http->get_response_body());
+		$response = (object) $this->parse_response($http->get_response_body());
 		
 		if ($this->header_mode)
-			$response['_header'] = $http->get_response_header();
+			$response->_header = $http->get_response_header();
 		
 		// Cache only successfuly requests
-		if ($this->cache_mode && $response['stat'] == 'ok')
+		if ($this->cache_mode && $response->stat == 'ok')
 		{
-			file_put_contents($cache . '_tmp', serialize($response));
+			file_put_contents($cache . '_tmp', json_encode($response));
 			rename($cache . '_tmp', $cache);
 		}
 		
@@ -212,7 +214,7 @@ class FlickrCache extends Flickr
 
 	/**
 	 * Method: parse_response()
-	 * 	Method for parsing the PHP serialized response data.
+	 * 	Method for parsing the JSON response data.
 	 *
 	 * Parameters:
 	 * 	data - _string_ (Required) The data to parse.
@@ -222,7 +224,6 @@ class FlickrCache extends Flickr
 	 */
 	public function parse_response($data)
 	{
-		return unserialize($data);
+		return json_decode($data);
 	}
 }
-
